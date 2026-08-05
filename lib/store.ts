@@ -87,6 +87,7 @@ interface QuestState {
   completedTodayCount: number;
   // Actions
   addQuest: (title: string, difficulty: Difficulty, period: QuestPeriod, type: QuestType) => void;
+  editQuest: (id: string, period: QuestPeriod, updates: Partial<Quest>) => void;
   toggleQuest: (id: string, period: QuestPeriod) => void;
   deleteQuest: (id: string, period: QuestPeriod) => void;
   resurrectQuest: (id: string) => void;
@@ -328,6 +329,19 @@ export const useQuestStore = create<QuestState>((set, get) => ({
     const key = QUESTS_KEY_MAP[period];
     set((s) => {
       const newState = { ...s, [key]: [...s[key], quest] };
+      saveToStorage(newState as QuestState);
+      return newState;
+    });
+  },
+
+  editQuest: (id, period, updates) => {
+    const key = QUESTS_KEY_MAP[period];
+    set((s) => {
+      const questList = s[key];
+      const updatedList = questList.map((q) =>
+        q.id === id ? { ...q, ...updates } : q
+      );
+      const newState = { ...s, [key]: updatedList };
       saveToStorage(newState as QuestState);
       return newState;
     });

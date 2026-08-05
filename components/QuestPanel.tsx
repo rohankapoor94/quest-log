@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuestStore } from '@/lib/store';
 import { DIFFICULTY_TIERS, PERIOD_CONFIG, type Difficulty, type QuestPeriod } from '@/lib/constants';
-import { Plus, Check, Trash2, X } from 'lucide-react';
+import { Plus, Check, Trash2, X, Edit2 } from 'lucide-react';
 
 // ─── Difficulty badge colors ────────────────────────────
 const difficultyStyles: Record<Difficulty, string> = {
@@ -27,6 +27,7 @@ export default function QuestPanel({ period }: QuestPanelProps) {
   const key = QUESTS_KEY_MAP[period];
   const quests = useQuestStore((s) => s[key]);
   const addQuest = useQuestStore((s) => s.addQuest);
+  const editQuest = useQuestStore((s) => s.editQuest);
   const toggleQuest = useQuestStore((s) => s.toggleQuest);
   const deleteQuest = useQuestStore((s) => s.deleteQuest);
   const config = PERIOD_CONFIG[period];
@@ -35,14 +36,26 @@ export default function QuestPanel({ period }: QuestPanelProps) {
   const [questName, setQuestName] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [questType, setQuestType] = useState<'habit' | 'one-off'>('one-off');
+  const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    if (!questName.trim()) return;
-    addQuest(questName.trim(), difficulty, period, questType);
+  const closeModal = () => {
     setQuestName('');
     setDifficulty('easy');
     setQuestType('one-off');
+    setEditingQuestId(null);
     setShowModal(false);
+  };
+
+  const handleSubmit = () => {
+    if (!questName.trim()) return;
+    
+    if (editingQuestId) {
+      editQuest(editingQuestId, period, { title: questName.trim(), difficulty, type: questType });
+    } else {
+      addQuest(questName.trim(), difficulty, period, questType);
+    }
+    
+    closeModal();
   };
 
   const completedCount = quests.filter((q) => q.completed).length;
@@ -128,14 +141,29 @@ export default function QuestPanel({ period }: QuestPanelProps) {
                   +{tier.xp} XP · +{tier.gold} G
                 </span>
 
-                {/* Delete */}
-                <button
-                  onClick={() => deleteQuest(quest.id, period)}
-                  className="shrink-0 text-muted-dim hover:text-danger opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                  aria-label="Delete quest"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {/* Actions */}
+                <div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                  <button
+                    onClick={() => {
+                      setEditingQuestId(quest.id);
+                      setQuestName(quest.title);
+                      setDifficulty(quest.difficulty);
+                      setQuestType(quest.type);
+                      setShowModal(true);
+                    }}
+                    className="p-1.5 text-muted-dim hover:text-foreground transition-colors cursor-pointer"
+                    aria-label="Edit quest"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => deleteQuest(quest.id, period)}
+                    className="p-1.5 text-muted-dim hover:text-danger transition-colors cursor-pointer"
+                    aria-label="Delete quest"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -152,7 +180,7 @@ export default function QuestPanel({ period }: QuestPanelProps) {
       {showModal && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-[fade-in_0.2s_ease-out] p-4"
-          onClick={() => setShowModal(false)}
+          onClick={closeModal}
         >
           <div
             className="bg-card border border-border-glow rounded-xl w-full max-w-md p-6 animate-[scale-in_0.2s_ease-out] shadow-2xl"
@@ -160,10 +188,10 @@ export default function QuestPanel({ period }: QuestPanelProps) {
           >
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-semibold font-[family-name:var(--font-cinzel)] text-foreground">
-                New {period.charAt(0).toUpperCase() + period.slice(1)} Quest
+                {editingQuestId ? 'Edit Quest' : `New ${period.charAt(0).toUpperCase() + period.slice(1)} Quest`}
               </h3>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 className="text-muted hover:text-foreground transition-colors cursor-pointer"
                 aria-label="Close"
               >
@@ -259,7 +287,7 @@ export default function QuestPanel({ period }: QuestPanelProps) {
                 disabled={!questName.trim()}
                 className="px-4 py-2 rounded-lg bg-xp/20 text-xp border border-xp/30 text-sm font-semibold hover:bg-xp/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
-                Add Quest
+                {editingQuestId ? 'Save Changes' : 'Add Quest'}
               </button>
             </div>
           </div>
