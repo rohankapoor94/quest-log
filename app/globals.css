@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #0b0f1c;
+  --color-foreground: #f1f0ee;
+  --color-card: #131830;
+  --color-card-hover: #181e3a;
+  --color-border: #232a54;
+  --color-border-glow: #2f3870;
+  --color-muted: #a3a2a0;
+  --color-muted-dim: #747270;
+  --color-gold: #ffd700;
+  --color-gold-dim: #b8960f;
+  --color-gold-glow: rgba(255, 215, 0, 0.15);
+  --color-ember: #ff6b35;
+  --color-ember-bright: #ff4500;
+  --color-ember-glow: rgba(255, 107, 53, 0.2);
+  --color-success: #4ade80;
+  --color-success-dim: #22c55e;
+  --color-success-glow: rgba(74, 222, 128, 0.15);
+  --color-xp: #a78bfa;
+  --color-xp-dim: #7c3aed;
+  --color-xp-glow: rgba(167, 139, 250, 0.15);
+  --color-danger: #ef4444;
+  --color-accent: #4f6df0;
+  --color-easy: #4ade80;
+  --color-medium: #60a5fa;
+  --color-hard: #f97316;
+  --color-boss: #ef4444;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-cinzel);
+
+  --animate-flame-outer: flame-outer 1.2s ease-in-out infinite alternate;
+  --animate-flame-mid: flame-mid 0.9s ease-in-out infinite alternate;
+  --animate-flame-inner: flame-inner 0.7s ease-in-out infinite alternate;
+  --animate-flame-core: flame-core 0.5s ease-in-out infinite alternate;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-toast-in: toast-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-toast-out: toast-out 0.3s ease-in forwards;
+  --animate-level-up: level-up 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-badge-earn: badge-earn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-scale-in: scale-in 0.2s ease-out;
+  --animate-trail-fill: trail-fill 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes flame-outer {
+  0% { transform: scaleY(1) scaleX(1); opacity: 0.7; }
+  100% { transform: scaleY(1.15) scaleX(0.9); opacity: 0.5; }
 }
+@keyframes flame-mid {
+  0% { transform: scaleY(1) scaleX(1); opacity: 0.8; }
+  100% { transform: scaleY(1.1) scaleX(0.95); opacity: 0.6; }
+}
+@keyframes flame-inner {
+  0% { transform: scaleY(1) scaleX(1); opacity: 0.9; }
+  100% { transform: scaleY(1.08) scaleX(0.97); opacity: 0.75; }
+}
+@keyframes flame-core {
+  0% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1.05); opacity: 0.85; }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes toast-in {
+  0% { transform: translateX(100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-out {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes level-up {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes badge-earn {
+  0% { transform: scale(0) rotate(-180deg); }
+  60% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes trail-fill {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-border-glow); }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection */
+::selection {
+  background: rgba(167, 139, 250, 0.3);
+  color: white;
+}
+
+/* Hide scrollbar for mobile tab bar */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
